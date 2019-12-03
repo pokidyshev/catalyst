@@ -187,6 +187,8 @@ class ConfigExperiment(Experiment):
     ) -> Optimizer:
         # @TODO 1: refactoring; this method is too long
         # @TODO 2: load state dicts for schedulers & criteria
+        data_params = dict(self.stages_config[stage]["data_params"])
+
         layerwise_params = \
             params.pop("layerwise_params", OrderedDict())
         no_bias_weight_decay = \
@@ -240,7 +242,8 @@ class ConfigExperiment(Experiment):
         optimizer_key = params.pop("optimizer_key", None)
         optimizer = OPTIMIZERS.get_from_params(**params, params=model_params)
 
-        if load_from_previous_stage:
+        stage_index = self.stages.index(stage)
+        if load_from_previous_stage and stage_index != 0:
             checkpoint_path = f"{self.logdir}/checkpoints/best_full.pth"
             checkpoint = utils.load_checkpoint(checkpoint_path)
 
